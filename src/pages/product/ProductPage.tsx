@@ -1,8 +1,7 @@
-
 export const ProductPage = () => {
     return (
         <div>
-            Product page
+            ProductPage
         </div>
     )
 }
