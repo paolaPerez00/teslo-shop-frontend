@@ -11,7 +11,7 @@ const CustomHeader = () => {
     const { gender } = useParams();
 
     const inputRef = useRef<HTMLInputElement>(null);
-    const query = searchParams.get('query');
+    const query = searchParams.get('query') || '';
 
     const handleInputSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key !== 'Enter') return;
