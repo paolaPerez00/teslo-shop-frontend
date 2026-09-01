@@ -4,13 +4,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CustomLogo } from "@/components/custom/CustomLogo"
 import { Link, useNavigate } from "react-router"
-import { loginAction } from "@/auth/actions/login.actions"
 import { toast } from "sonner"
 import { useState } from "react"
+import { useAuthStore } from "@/auth/store/auth.stores"
 
 export const LoginPage = () => {
 
     const navigate = useNavigate();
+    const { login } = useAuthStore();
     const [isPosting, setIsPosting] = useState(false);
 
     const handleLogin = async (event: React.SubmitEvent<HTMLFormElement>) => {
@@ -19,14 +20,13 @@ export const LoginPage = () => {
         const formData = new FormData(event.target as HTMLFormElement);
         const email = formData.get('email') as string;
         const password = formData.get('password') as string;
+        const isLoginValid = await login(email, password);
 
-        try {
-            const data = await loginAction(email, password);
-            localStorage.setItem('token', data.token)
-            navigate('/')
-        } catch (error) {
-            toast.error('Correo y/o contraseña no válidos')
+        if (isLoginValid) {
+            navigate('/');
+            return;
         }
+        toast.error('Correo y/o contraseña no válidos')
         setIsPosting(false)
     }
 
