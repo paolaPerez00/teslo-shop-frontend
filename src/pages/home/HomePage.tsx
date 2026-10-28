@@ -11,7 +11,7 @@ export const HomePage = () => {
         <>
             <CustomJumbotron title="Todos los productos"></CustomJumbotron >
             <ProductsGrid products={data?.products || []}></ProductsGrid >
-            <CustomPagination totalPages={data?.pages}></CustomPagination >
+            <CustomPagination totalPages={data?.pages || 1}></CustomPagination >
         </>
     )
 }
