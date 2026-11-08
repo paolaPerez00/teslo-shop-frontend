@@ -6,18 +6,18 @@ import { Link } from 'react-router';
 import { useRef, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { cn } from "@/lib/utils";
-import { products } from "@/mock/products.mocks";
-
 interface Props {
     title: string;
     subtitle: string;
     product: Product;
-}
 
+    //methods
+    onSubmit: (productLike: Partial<Product>) => Promise<void>;
+}
 
 const availableSizes: Size[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
-export const ProductForm = ({ title, subtitle, product }: Props) => {
+export const ProductForm = ({ title, subtitle, product, onSubmit }: Props) => {
 
     const [dragActive, setDragActive] = useState(false);
     const {
@@ -33,6 +33,7 @@ export const ProductForm = ({ title, subtitle, product }: Props) => {
 
     const selectedSizes = watch('sizes')
     const selectedTags = watch('tags')
+    const currentStock = watch('stock')
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -84,10 +85,6 @@ export const ProductForm = ({ title, subtitle, product }: Props) => {
         const files = e.target.files;
         console.log(files);
     };
-
-    const onSubmit = (productLike: Product) => {
-        console.log("onSubmit ", productLike, errors)
-    }
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -433,16 +430,16 @@ export const ProductForm = ({ title, subtitle, product }: Props) => {
                                         Inventario
                                     </span>
                                     <span
-                                        className={`px-2 py-1 text-xs font-medium rounded-full ${product.stock > 5
+                                        className={`px-2 py-1 text-xs font-medium rounded-full ${currentStock > 5
                                             ? 'bg-green-100 text-green-800'
-                                            : product.stock > 0
+                                            : currentStock > 0
                                                 ? 'bg-yellow-100 text-yellow-800'
                                                 : 'bg-red-100 text-red-800'
                                             }`}
                                     >
-                                        {product.stock > 5
+                                        {currentStock > 5
                                             ? 'En stock'
-                                            : product.stock > 0
+                                            : currentStock > 0
                                                 ? 'Bajo stock'
                                                 : 'Sin stock'}
                                     </span>
@@ -462,7 +459,7 @@ export const ProductForm = ({ title, subtitle, product }: Props) => {
                                         Tallas disponibles
                                     </span>
                                     <span className="text-sm text-slate-600">
-                                        {product.sizes.length} tallas
+                                        {selectedSizes.length} tallas
                                     </span>
                                 </div>
                             </div>
