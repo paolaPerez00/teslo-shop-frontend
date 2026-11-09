@@ -23,7 +23,7 @@ export const createUpdateProductAction = async (
     }
 
     const imagesToSave = images.map(image => {
-        if (image.includes('http')) return image.split('/').pop || '';
+        if (image.includes('http')) return image.split('/').pop() || '';
         return image;
     })
 
