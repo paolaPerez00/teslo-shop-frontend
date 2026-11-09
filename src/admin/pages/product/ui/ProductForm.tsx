@@ -3,7 +3,7 @@ import type { Product, Size } from "@/interfaces/product.interface";
 import { X, Plus, Upload, Tag, SaveAll } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { cn } from "@/lib/utils";
 interface Props {
@@ -13,10 +13,14 @@ interface Props {
     isRequestPending: boolean;
 
     //methods
-    onSubmit: (productLike: Partial<Product>) => Promise<void>;
+    onSubmit: (productLike: Partial<Product> & { files?: File[] }) => Promise<void>;
 }
 
 const availableSizes: Size[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+interface FormInputs extends Product {
+    files?: File[]
+}
 
 export const ProductForm = ({ title, subtitle, product, isRequestPending, onSubmit }: Props) => {
 
@@ -28,7 +32,7 @@ export const ProductForm = ({ title, subtitle, product, isRequestPending, onSubm
         getValues,
         setValue,
         watch
-    } = useForm({
+    } = useForm<FormInputs>({
         defaultValues: product
     })
 
@@ -37,6 +41,11 @@ export const ProductForm = ({ title, subtitle, product, isRequestPending, onSubm
     const currentStock = watch('stock')
 
     const inputRef = useRef<HTMLInputElement>(null);
+    const [files, setFiles] = useState<File[]>([]);
+
+    useEffect(() => {
+        setFiles([])
+    }, [product])
 
     const addTag = () => {
         const newTag = inputRef.current!.value;
@@ -79,12 +88,18 @@ export const ProductForm = ({ title, subtitle, product, isRequestPending, onSubm
         e.stopPropagation();
         setDragActive(false);
         const files = e.dataTransfer.files;
-        console.log(files);
+        if (!files) return;
+        setFiles(prev => [...prev, ...Array.from(files)]);
+        const currentFiles = getValues('files') || [];
+        setValue('files', [...currentFiles, ...Array.from(files)])
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
-        console.log(files);
+        if (!files) return;
+        setFiles(prev => [...prev, ...Array.from(files)]);
+        const currentFiles = getValues('files') || [];
+        setValue('files', [...currentFiles, ...Array.from(files)])
     };
 
     return (
@@ -405,6 +420,27 @@ export const ProductForm = ({ title, subtitle, product, isRequestPending, onSubm
                                                 {image}
                                             </p>
                                         </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/*Imagenes por cargar */}
+                            <div className={
+                                cn("mt-6 space-y-3", {
+                                    'hidden': files.length === 0
+                                })
+                            }>
+                                <h3 className="text-sm font-medium text-slate-700">
+                                    Imágenes por cargar
+                                </h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {files.map((file, index) => (
+                                        <img
+                                            src={URL.createObjectURL(file)}
+                                            key={index}
+                                            alt="Product"
+                                            className="w-full h-full object-cover rounded-lg"
+                                        />
                                     ))}
                                 </div>
                             </div>
